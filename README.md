@@ -9,3 +9,5 @@ LoginPage
 ![loginpage](https://raw.githubusercontent.com/guschar92/Authorizer/master/GH_img/login.PNG)
 RegisterPage
 ![newuserpage](https://raw.githubusercontent.com/guschar92/Authorizer/master/GH_img/new_user.PNG)
+HomePage
+![homepage](https://raw.githubusercontent.com/guschar92/Authorizer/master/GH_img/home.PNG)
