@@ -1,0 +1,107 @@
+-- Table: authorizer_access
+
+-- DROP TABLE authorizer_access;
+
+CREATE TABLE authorizer_access
+(
+  pass_id integer NOT NULL,
+  user_id integer NOT NULL,
+  access_id serial NOT NULL,
+  CONSTRAINT authorizer_access_pkey PRIMARY KEY (pass_id, user_id),
+  CONSTRAINT authorizer_access_pass_id_fkey FOREIGN KEY (pass_id)
+      REFERENCES authorizer_password (pass_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE,
+  CONSTRAINT authorizer_access_user_id_fkey FOREIGN KEY (user_id)
+      REFERENCES authorizer_user (user_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE authorizer_access
+  OWNER TO portal;
+
+
+-- Table: authorizer_key
+
+-- DROP TABLE authorizer_key;
+
+CREATE TABLE authorizer_key
+(
+  aes character varying(1000) NOT NULL,
+  CONSTRAINT authorizer_key_pkey PRIMARY KEY (aes)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE authorizer_key
+  OWNER TO portal;
+
+
+-- Table: authorizer_password
+
+-- DROP TABLE authorizer_password;
+
+CREATE TABLE authorizer_password
+(
+  pass_id serial NOT NULL,
+  name character varying(100),
+  username character varying(100),
+  password character varying(1000),
+  note character varying(1000),
+  owner_id integer,
+  host character varying(200),
+  CONSTRAINT authorizer_password_pkey PRIMARY KEY (pass_id),
+  CONSTRAINT owner_id_fk FOREIGN KEY (owner_id)
+      REFERENCES authorizer_user (user_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE,
+  CONSTRAINT uniquename UNIQUE (name)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE authorizer_password
+  OWNER TO portal;
+
+
+-- Table: authorizer_user
+
+-- DROP TABLE authorizer_user;
+
+CREATE TABLE authorizer_user
+(
+  user_id serial NOT NULL,
+  name character varying(100),
+  email character varying(100) NOT NULL,
+  username character varying(100) NOT NULL,
+  password character varying(1000) NOT NULL,
+  note character varying(1000),
+  surname character varying(100),
+  token character varying(1000),
+  CONSTRAINT authorizer_user_pkey PRIMARY KEY (user_id),
+  CONSTRAINT unique_username UNIQUE (username)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE authorizer_user
+  OWNER TO portal;
+
+
+-- Function: decrypt_aes(character varying)
+
+-- DROP FUNCTION decrypt_aes(character varying);
+
+CREATE OR REPLACE FUNCTION decrypt_aes(hash character varying)
+  RETURNS text AS
+$BODY$
+DECLARE
+	dkey bytea := (select aes from authorizer_key limit 1);
+BEGIN
+    RETURN decrypt(hash::bytea, dkey, 'aes');
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION decrypt_aes(character varying)
+  OWNER TO postgres;

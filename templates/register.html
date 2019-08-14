@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='./img/favicon.ico') }}"/>
+    <title>Register</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/login.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/style.css') }}"/>
+</head>
+<body>
+
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Icon -->
+    <div class="fadeIn first">
+        <h3>Create User</h3>
+<!--      <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" />-->
+    </div>
+    <!-- Login Form -->
+    <form action="/create_user" onkeyup="Validate();" method="POST">
+      <input type="text" id="name" class="fadeIn second" name="name" placeholder="name" autocomplete="off">
+      <input type="text" id="surname" class="fadeIn third" name="surname" placeholder="surname" autocomplete="off">
+      <input type="text" id="username" class="fadeIn third" name="username" placeholder="username*" autocomplete="off">
+      <input type="password" id="password" class="fadeIn third" name="password" placeholder="password*" autocomplete="off">
+         <a href="#" onclick="passwordToggler(this.id);" id="togglePass"><i title="Show Password" class="fas fa-eye"></i></a>
+      <input type="password" id="password2" class="fadeIn third" name="password2" placeholder="password*" autocomplete="off">
+      <input type="text" id="email" class="fadeIn third" name="email" placeholder="email*" autocomplete="off">
+      <input type="text" id="note" class="fadeIn third" name="note" placeholder="note" autocomplete="off">
+      <input type="submit" id="sub_btn" class="fadeIn fourth" value="Register" disabled>
+    </form>
+      <i id="msg" style="padding:2px;">{{ msg }}</i>
+    <!-- Remind Passowrd -->
+    <div id="formFooter">
+        <a class="underlineHover" href="/login">Login</a>
+    </div>
+
+  </div>
+</div>
+</body>
+<script src="{{ url_for('static', filename='./js/utils.js') }}"></script>
+<script>
+    function ValidateEmail(mail) {
+         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail.val())) {
+            mail[0].style.borderBottomColor = '#32CD32';
+            return true;
+          }
+          else{
+            mail[0].style.borderBottomColor = 'red';
+            return false;
+         }
+    }
+    function valField(field){
+         if (field.val() != '') {
+            field[0].style.borderBottomColor = '#32CD32';
+            return true;
+         }
+         else{
+           field[0].style.borderBottomColor = 'red';
+           return false;
+         }
+    }
+
+
+    function Validate() {
+        tf = false;
+        name = valField($('#name'));
+        username = valField($('#username'));
+        surname = valField($('#surname'));
+        password = valField($('#password'));
+        password2 = ValidatePwd();
+        email = ValidateEmail($('#email'));
+
+        if (name && username && surname && password && password2 && email){
+            $('#sub_btn').removeAttr('disabled');
+            $('#sub_btn').attr('cursor','pointer');
+         }
+        else{
+            $('#sub_btn').attr('disabled','disabled');
+            $('#sub_btn').attr('cursor','default');
+        }
+    }
+
+    function ValidatePwd() {
+    pwd1 = $('#password').val();
+    pwd2 = $('#password2').val();
+     if (pwd1 == pwd2 && pwd2 != '') {
+         $('#password')[0].style.borderBottomColor = '#32CD32';
+         $('#password2')[0].style.borderBottomColor = '#32CD32';
+        return (true);
+     }
+        $('#password')[0].style.borderBottomColor = 'red';
+        $('#password2')[0].style.borderBottomColor = 'red';
+        return (false);
+    }
+
+</script>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='./img/favicon.ico') }}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css">
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/style.css') }}"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <title>Authorizer</title>
+</head>
+<body>
+{% if err == 'err0' %}
+    <div class="alert">
+      <span class="closebtn" onclick="window.location.href='/';">&times;</span>
+     The PID you entered was either invalid or you have no access to it.
+    </div>
+    {% elif err == 'err1' %}
+    <div class="alert">
+      <span class="closebtn" onclick="window.location.href='/';">&times;</span>
+     Password creation failed.
+    </div>
+    {% elif err == 'err2' %}
+    <div class="alert">
+      <span class="closebtn" onclick="window.location.href='/';">&times;</span>
+     Password update failed.
+    </div>
+    {% elif err == 'err3' %}
+    <div class="alert">
+      <span class="closebtn" onclick="window.location.href='/';">&times;</span>
+     Only Administrator has access to this page.
+    </div>
+    {% elif err == 'created' or err == 'updated' %}
+    <div class="alert" style="background:#4CAF50">
+      <span class="closebtn" onclick="window.location.href='/';">&times;</span>
+     Password {{ err }} successfully.
+</div>
+{% endif %}
+<div>
+    <span style="float:right;margin-right:20px;">Logged in as <a href="/profile/{{user}}"><b>{{ user }}</b></a></span>
+    <input type="button" class="logout_btn" value="Logout" onclick="window.location.href='/logout'"/>
+    <input type="button" class="logout_btn" value="Create Password" onclick="window.location.href='/create_password'"/>
+    {% if user_id == 1 %}
+    <input type="button" class="logout_btn" value="User Access" onclick="window.location.href='/accessview'"/>
+    <input type="button" class="logout_btn" value="Users" onclick="window.location.href='/usersview'"/>
+    {% endif %}
+</div>
+<div id="container">
+<input type="text" id="searchbar" onkeyup="search(this.value);"/>
+        <table class="table">
+            <thead>
+            <tr><th>PID</th>
+                <th>Name</th>
+                <th>Host</th>
+                <th>Username</th>
+                <th>Password<a href="#" onclick="pwdToggle()"><i id="pwdToggler" title="Show Password" class="fas fa-eye"></i></a></th>
+                <th>Note</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pass in pwd|sort(attribute='pass_id') %}
+            <tr class="tbrow">
+                <td>{{ pass.pass_id }}</td>
+                <td>{{ pass.name }}<a href="#" onclick="clipboard(this);" title="Copy to Clipboard"><img class="icon22" src="{{ url_for('static', filename='./img/clipboard.png') }}"/></a></td>
+                <td>{% if pass.host %}{{ pass.host }}<a href="#" onclick="clipboard(this);" title="Copy to Clipboard">
+                    <img class="icon22" src="{{ url_for('static', filename='./img/clipboard.png') }}"/></a>{% endif %}</td>
+                <td>{{ pass.username }}
+                    <a href="#" onclick="clipboard(this);" title="Copy to Clipboard">
+                        <img class="icon22" src="{{ url_for('static', filename='./img/clipboard.png') }}"/></a></td>
+                <td class="pwdshow" hidden>{{ pass.password }}
+                    <a href="#" onclick="clipboard(this);" title="Copy to Clipboard"><img class="icon22" src="{{ url_for('static', filename='./img/clipboard.png') }}"/></a></td>
+                    <td class="pwdhide">********</td>
+                <td>{% if pass.note %} {{ pass.note|safe }}<a href="#" onclick="clipboard(this);" title="Copy to Clipboard">
+                    <img class="icon22" src="{{ url_for('static', filename='./img/clipboard.png') }}"/></a> {% endif %}</td>
+                <td>{% if user_id == pass.owner_id or user_id == 1%}
+                    <a href="/edit/{{ pass.pass_id }}" >
+                        <img class="icon22" title="Edit" src="{{ url_for('static', filename='./img/edit.png') }}" />
+                    </a>
+                    <a href="#" id="{{ pass.pass_id }}" onclick="confirmation({{ pass.pass_id }});">
+                        <img class="icon22" title="Delete" src="{{ url_for('static', filename='./img/bin.png') }}" />
+                    </a>
+                    <a href="#" onclick="clipboardUrl('http://sisyphos:9966/token={{ token }}/name={{pass.name}}');">
+                        <img class="icon22" title="Copy URL" src="{{ url_for('static', filename='./img/url.png') }}" />
+                    </a>{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="{{ url_for('static', filename='./js/searchtab.js') }}"></script>
+<script src="{{ url_for('static', filename='./js/utils.js') }}"></script>
+<script>
+
+
+    function pwdToggle() {
+      toggler = document.getElementById("pwdToggler");
+      cls =  toggler.classList;
+      var x = document.getElementsByClassName("pwdshow");
+      var y = document.getElementsByClassName("pwdhide");
+      if (cls.contains('fa-eye-slash')){
+          $(x).hide();
+          $(y).show();
+          cls.add('fa-eye');
+          cls.remove('fa-eye-slash');
+          toggler.title = 'Show Password';
+      }
+      else{
+          $(x).show();
+          $(y).hide();
+          cls.add('fa-eye-slash');
+          cls.remove('fa-eye');
+          toggler.title = 'Hide Password';
+      }
+    }
+
+    function confirmation(id){
+          var r = confirm("Sure you want to delete?");
+          if (r == true) {
+              $.ajax({
+                  url: "/delete",
+                  type: "POST",
+                  data: {id: id},
+                  success: function(data) {
+                      console.log(data);
+                      location.reload();
+                  },
+              });
+          }
+    }
+
+</script>
+</html>

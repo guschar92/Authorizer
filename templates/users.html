@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='./img/favicon.ico') }}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/style.css') }}"/>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <title>Users View</title>
+</head>
+<body>
+{% if err == 'succ0' %}
+    <div class="alert" style="background:#4CAF50">
+      <span class="closebtn" onclick="window.location.href='/usersview';">&times;</span>
+     User deleted Successfully.
+    </div>
+{% endif %}
+<div>
+    <span style="float:right;margin-right:20px;">Logged in as <a href="/profile/{{user}}"><b>{{ user }}</b></a></span>
+    <input type="button" class="logout_btn" value="Logout" onclick="window.location.href='/logout'"/>
+    <input type="button" class="logout_btn" value="Back" onclick="window.location.href='/'"/>
+</div>
+<div id="container">
+<input type="text" id="searchbar" onkeyup="search(this.value);"/>
+
+        <table class="table" style="text-align:center;">
+            <thead>
+            <tr><th>UserID</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Email</th>
+                <th>Token</th>
+                <th>Note</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for up in users|sort(attribute='user_id') %}
+            <tr class="tbrow">
+                <td>{{ up.user_id }}</td>
+                <td>{{ up.username }}</td>
+                <td>{{ up.name|none }}</td>
+                <td>{{ up.surname|none }}</td>
+                <td>{{ up.email }}</td>
+                <td>{{ up.token }}</td>
+                <td>{{ up.note|none }}</td>
+                <td><a href="#" id="{{up.user_id}}" onclick="deleteUser(this.id);">
+                    <img class="revoke" title="Delete User" src="{{ url_for('static', filename='./img/revoke2.png') }}"/></a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+</div>
+</body>
+<script src="{{ url_for('static', filename='./js/searchtab.js') }}"></script>
+<script>
+    function deleteUser(id){
+        var r = confirm("Sure you want to revoke Access?");
+        if (r == true) {
+            uid = id;
+            $.ajax({
+              url: "/deleteuser",
+              type: "POST",
+              data: {id: uid},
+              success: function(data) {
+                  window.location.href=data;
+              },
+            });
+        }
+    }
+
+</script>
+</html>

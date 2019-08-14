@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='./img/favicon.ico') }}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/style.css') }}"/>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <title>Access View</title>
+</head>
+<body>
+{% if err == 'err0' %}
+    <div class="alert" style="background:#2196F3;">
+      <span class="closebtn" onclick="window.location.href='/accessview';">&times;</span>
+     Access already Granted.
+    </div>
+{% elif err == 'succ0' %}
+    <div class="alert" style="background:#4CAF50">
+      <span class="closebtn" onclick="window.location.href='/accessview';">&times;</span>
+     Access Revoked Successfully.
+    </div>
+{% endif %}
+<div>
+    <span style="float:right;margin-right:20px;">Logged in as <a href="/profile/{{user}}"><b>{{ user }}</b></a></span>
+    <input type="button" class="logout_btn" value="Logout" onclick="window.location.href='/logout'"/>
+    <input type="button" class="logout_btn" value="Back" onclick="window.location.href='/'"/>
+</div>
+<div id="container">
+<input type="text" id="searchbar" onkeyup="search(this.value);"/>
+<div>
+    <select id="userlist" name="user_id" class="list">
+        {% for user in users|sort(attribute='username') %}
+        <option value="{{ user.user_id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+    <select id="passlist" name="pass_id" class="list">
+        {% for pwd in pwds|sort(attribute='name') %}
+        <option value="{{ pwd.pass_id }}">{{ pwd.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="button" class="logout_btn" onclick="grantAccess();" value="Grant Access">
+</div>
+        <table class="table" style="text-align:center;">
+            <thead>
+            <tr><th>UserID</th>
+                <th>Username</th>
+                <th>PID</th>
+                <th>Password Name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for up in userpass %}
+            <tr class="tbrow">
+                <td>{{ up.user_id }}</td>
+                <td>{{ up.username }}</td>
+                <td>{{ up.pass_id }}</td>
+                <td>{{ up.name }}</td>
+                <td><a href="#" id="{{up.user_id}}-{{up.pass_id}}" onclick="revokeAccess(this.id);">
+                    <img class="revoke" title="Revoke Access" src="{{ url_for('static', filename='./img/revoke2.png') }}"/></a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+</div>
+</body>
+<script src="{{ url_for('static', filename='./js/searchtab.js') }}"></script>
+<script>
+    function grantAccess(){
+        uid = document.getElementById('userlist').value;
+        pid = document.getElementById('passlist').value;
+        $.ajax({
+          url: "/grantaccess",
+          type: "POST",
+          data: {user_id: uid,pass_id: pid},
+          success: function(data) {
+              window.location.href=data;
+          },
+        });
+    }
+
+    function revokeAccess(id){
+          var r = confirm("Sure you want to revoke Access?");
+          if (r == true) {
+              $.ajax({
+                  url: "/revokeaccess",
+                  type: "POST",
+                  data: {id: id},
+                  success: function(data) {
+                      window.location.href=data;
+                  },
+              });
+          }
+    }
+</script>
+</html>
