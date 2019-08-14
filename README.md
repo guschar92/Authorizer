@@ -5,4 +5,7 @@ i.e. http://servername.com/token={user_token}/name={password_name}
 
 Also there is a management system with an Administrator Account that manages Users,Passwords and their between relationships (Access).
 
+LoginPage
 ![loginpage](https://raw.githubusercontent.com/guschar92/Authorizer/master/GH_img/login.PNG)
+RegisterPage
+![newuserpage](https://raw.githubusercontent.com/guschar92/Authorizer/master/GH_img/new_user.PNG)
