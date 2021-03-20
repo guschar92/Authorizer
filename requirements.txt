@@ -15,7 +15,7 @@ future==0.17.1
 idna==2.8
 imagesize==1.1.0
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 MarkupSafe==1.1.1
 Naked==0.1.31
 packaging==19.0
