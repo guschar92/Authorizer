@@ -25,7 +25,7 @@ pycparser==2.19
 Pygments==2.3.1
 pyparsing==2.4.0
 pytz==2019.1
-PyYAML==5.1
+PyYAML==5.4
 recommonmark==0.5.0
 requests==2.21.0
 rinoh-typeface-dejavuserif==0.1.1
